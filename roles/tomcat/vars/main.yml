@@ -1,0 +1,6 @@
+---
+tomcat_basedir: /tomcat
+tomcat_version: 8.5.85
+tomcat_port_rule: 8080/tcp
+tomcat_app: "{{ tomcat_basedir }}/apache-tomcat-{{ tomcat_version }}/webapps/ROOT"
+service_unit: tomcat.service

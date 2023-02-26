@@ -1,0 +1,15 @@
+[Unit]
+Description=tomcat-{{ tomcat_version }}
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=root
+Group=root
+
+ExecStart={{ tomcat_basedir }}/apache-tomcat-{{ tomcat_version }}/bin/startup.sh
+ExecStop={{ tomcat_basedir }}/apache-tomcat-{{ tomcat_version }}/bin/shutdown.sh
+
+
+[Install]
+WantedBy=multi-user.target

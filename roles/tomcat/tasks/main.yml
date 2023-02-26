@@ -1,0 +1,54 @@
+---
+- name: install java package
+  dnf:
+    name: java-1.8.0-openjdk-devel
+    state: present
+
+- name: create directory
+  file:
+    path: "{{ tomcat_basedir }}"
+    state: directory
+
+- name: download tomcat 
+  get_url:
+    url: https://archive.apache.org/dist/tomcat/tomcat-8/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz
+    dest: /tomcat/
+
+- name: unarchive tomcat file
+  unarchive:
+    src: /tomcat/apache-tomcat-{{ tomcat_version }}.tar.gz
+    dest: "{{ tomcat_basedir }}"
+    remote_src: yes
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+ 
+- name: start and enable firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: add {{ tomcat_port_rule }} port
+  firewalld:
+    port: "{{ tomcat_port_rule }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: deploy tomcat app 
+  template:
+    src: index.jsp.j2
+    dest: "{{ tomcat_app }}/index.jsp"  
+
+- name: create systemd unit file
+  template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/{{ service_unit }}
+
+- name: start tomcat service
+  service:
+    name: "{{ service_unit }}" 
+    state: started
+    enabled: yes
